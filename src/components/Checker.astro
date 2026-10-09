@@ -1,0 +1,34 @@
+<div class="checker" aria-hidden="true"></div>
+
+<style>
+  .checker {
+    --tile: 64px;
+    --cell: color-mix(in srgb, var(--accent) 4%, transparent);
+
+    position: fixed;
+    inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
+    z-index: 0;
+    pointer-events: none;
+    background-image: conic-gradient(
+      var(--cell) 90deg,
+      transparent 90deg 180deg,
+      var(--cell) 180deg 270deg,
+      transparent 270deg
+    );
+    background-size: var(--tile) var(--tile);
+    animation: checker-drift 8s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes checker-drift {
+    to {
+      transform: translate(var(--tile), var(--tile));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .checker {
+      animation: none;
+    }
+  }
+</style>

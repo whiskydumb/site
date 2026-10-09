@@ -1,0 +1,40 @@
+---
+import "~/styles/global.css"
+import Checker from "~/components/Checker.astro"
+import { DEFAULT_PALETTE, PALETTES } from "~/palettes"
+import { SITE } from "~/consts"
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const { title = SITE.title, description = SITE.description } = Astro.props
+---
+
+<!doctype html>
+<html lang="en" data-palette={DEFAULT_PALETTE}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <script is:inline define:vars={{ palettes: PALETTES }}>
+      let palette = null
+      try {
+        palette = localStorage.getItem("palette")
+      } catch {}
+      if (!palettes.includes(palette)) {
+        palette = palettes[Math.floor(Math.random() * palettes.length)]
+        try {
+          localStorage.setItem("palette", palette)
+        } catch {}
+      }
+      document.documentElement.dataset.palette = palette
+    </script>
+  </head>
+  <body>
+    <Checker />
+    <slot />
+  </body>
+</html>

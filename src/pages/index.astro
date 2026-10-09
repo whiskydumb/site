@@ -1,0 +1,21 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro"
+import Window from "~/components/Window.astro"
+---
+
+<BaseLayout>
+  <main>
+    <Window />
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: clamp(40px, 6vh, 96px) 16px;
+  }
+</style>
