@@ -1,6 +1,10 @@
 :root {
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
   --fs: clamp(15px, 0.42vw + 8px, 19px);
+  --window-width: clamp(600px, 52vw, 1120px);
+  --layer-1: color-mix(in srgb, var(--fg) 5%, var(--surface));
+  --layer-2: color-mix(in srgb, var(--fg) 9%, var(--surface));
 
   color-scheme: dark;
 }
@@ -69,6 +73,28 @@ body {
   color: var(--fg);
   font: 400 var(--fs) / 1.6 var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.35s,
+    color 0.35s;
+}
+
+sup {
+  position: relative;
+  top: -0.5em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+html {
+  cursor: var(--cursor-default, auto);
+}
+
+:where(a[href], button:not(:disabled), summary, label:has(input[type="checkbox"]), input[type="checkbox"], [role="tab"]) {
+  cursor: var(--cursor-pointer, pointer);
+}
+
+:where(input:not([type="checkbox"]), textarea, [contenteditable]) {
+  cursor: auto;
 }
 
 :focus-visible {

@@ -1,0 +1,145 @@
+---
+import type { MarkdownHeading } from "astro"
+
+interface Props {
+  headings: readonly MarkdownHeading[]
+}
+
+const MIN_ITEMS = 3
+
+const items = Astro.props.headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
+---
+
+{
+  items.length >= MIN_ITEMS && (
+    <>
+      <nav class="side" aria-label="contents">
+        <p class="side-title">contents</p>
+        <ul>
+          {items.map(({ depth, slug, text }) => (
+            <li class={`depth-${depth}`}>
+              <a href={`#${slug}`}>{text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <details class="inline">
+        <summary>contents</summary>
+        <ul>
+          {items.map(({ depth, slug, text }) => (
+            <li class={`depth-${depth}`}>
+              <a href={`#${slug}`}>{text}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </>
+  )
+}
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(":is(.side, .inline) a")]
+  const headings = [...document.querySelectorAll<HTMLElement>(".prose :is(h2, h3)[id]")]
+
+  const ACTIVE_LINE = 0.35
+
+  const update = () => {
+    const line = innerHeight * ACTIVE_LINE
+    const current = headings.filter((heading) => heading.getBoundingClientRect().top < line).at(-1)
+    for (const link of links) link.classList.toggle("active", link.hash === `#${current?.id}`)
+  }
+
+  if (links.length > 0) {
+    addEventListener("scroll", () => requestAnimationFrame(update), { passive: true })
+    update()
+  }
+</script>
+
+<style>
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding: 0.15em 0;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  a:hover {
+    color: var(--fg);
+  }
+
+  a.active {
+    color: var(--accent);
+  }
+
+  .depth-3 a {
+    padding-left: 1.5ch;
+  }
+
+  .side {
+    position: fixed;
+    top: 100px;
+    left: calc(50% + var(--window-width) / 2 + 28px);
+    z-index: 2;
+    display: none;
+    width: 15rem;
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: 0.4em 0.4em 0 color-mix(in srgb, var(--bg) 55%, #000);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .side-title {
+    margin: 0;
+    padding: 0.6em 1em;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 0.95em;
+    font-weight: 600;
+  }
+
+  .side ul {
+    padding: 0.6em 1em 0.8em;
+  }
+
+  .inline {
+    font-size: 14px;
+  }
+
+  .inline summary {
+    width: fit-content;
+    color: var(--muted);
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .inline summary:hover {
+    color: var(--accent);
+  }
+
+  .inline ul {
+    margin-top: 0.6em;
+    padding-left: 1.5ch;
+    border-left: 1px solid var(--line);
+  }
+
+  @media (min-width: 1100px) {
+    .side {
+      display: block;
+    }
+
+    .inline {
+      display: none;
+    }
+  }
+</style>

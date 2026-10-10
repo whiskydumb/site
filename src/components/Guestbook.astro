@@ -1,0 +1,226 @@
+<div class="guestbook">
+  <ol class="entries"></ol>
+
+  <form class="form" data-guestbook novalidate>
+    <textarea class="message" name="message" maxlength="280" placeholder="leave a message" aria-label="message"
+    ></textarea>
+    <div class="row">
+      <div class="side">
+        <label class="dm"><input type="checkbox" name="dm" /> direct message</label>
+        <button class="hint" type="button" aria-describedby="dm-tip">
+          ?
+          <span class="tip" id="dm-tip" role="tooltip">
+            goes only to me. it won't be shown here, and i might not be able to reply.
+          </span>
+        </button>
+      </div>
+      <div class="side">
+        <span>send as</span>
+        <input class="sender" name="sender" maxlength="32" size="14" placeholder="anon" aria-label="sender name" />
+        <button class="send" type="submit">send</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const STORAGE_KEY = "guestbook-sender"
+
+  const save = (name: string) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, name)
+    } catch {}
+  }
+
+  const load = () => {
+    try {
+      return localStorage.getItem(STORAGE_KEY)
+    } catch {
+      return null
+    }
+  }
+
+  const form = document.querySelector<HTMLFormElement>("[data-guestbook]")
+  const sender = form?.querySelector<HTMLInputElement>(".sender")
+  const dm = form?.querySelector<HTMLInputElement>("input[name=dm]")
+  const message = form?.querySelector<HTMLTextAreaElement>(".message")
+  const send = form?.querySelector<HTMLButtonElement>(".send")
+
+  if (form && sender && dm && message && send) {
+    sender.value = load() ?? ""
+
+    sender.addEventListener("change", () => {
+      sender.value = sender.value.trim()
+      save(sender.value)
+    })
+
+    dm.addEventListener("change", () => {
+      send.textContent = dm.checked ? "send privately" : "send"
+      message.placeholder = dm.checked ? "only i will see this" : "leave a message"
+    })
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault()
+    })
+  }
+</script>
+
+<style>
+  .guestbook {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.9em;
+  }
+
+  .entries {
+    display: grid;
+    gap: 0.55em;
+    max-height: 14em;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+    font-size: 0.95em;
+  }
+
+  .entries b {
+    margin-right: 0.6em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .form {
+    display: grid;
+    gap: 0.6em;
+    margin-top: auto;
+  }
+
+  .message {
+    width: 100%;
+    height: 4.6em;
+    padding: 0.6em 0.7em;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.95em;
+    resize: none;
+  }
+
+  .message:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6em 1.2em;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+
+  .side {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .dm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--fg);
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .dm input {
+    margin: 0;
+    accent-color: var(--accent);
+  }
+
+  .hint {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 1.25em;
+    height: 1.25em;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+    color: var(--muted);
+    font-size: 0.8em;
+    line-height: 1;
+    cursor: help;
+  }
+
+  .hint:hover,
+  .hint:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .tip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.6em);
+    z-index: 5;
+    width: max-content;
+    max-width: 17em;
+    padding: 0.5em 0.7em;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    font-size: 1.15em;
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: opacity 0.15s;
+  }
+
+  .hint:hover .tip,
+  .hint:focus-visible .tip {
+    opacity: 1;
+  }
+
+  .sender {
+    min-width: 4ch;
+    max-width: 18ch;
+    padding: 0 0.1em;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--line);
+    color: var(--fg);
+    font: inherit;
+    field-sizing: content;
+  }
+
+  .sender:focus {
+    border-bottom-color: var(--accent);
+    outline: none;
+  }
+
+
+  .send {
+    padding: 0.35em 0.8em;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    font: inherit;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .send:hover {
+    border-color: var(--muted);
+  }
+</style>

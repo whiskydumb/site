@@ -1,0 +1,206 @@
+.prose {
+  min-width: 0;
+  color: color-mix(in srgb, var(--fg) 85%, var(--bg));
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose p {
+  margin: 0 0 1.1em;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  margin: 1.5em 0 0.5em;
+  color: var(--fg);
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6)[id] {
+  cursor: var(--cursor-pointer, pointer);
+  scroll-margin-top: 1.5em;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6)::before {
+  color: var(--muted);
+}
+
+.prose h1::before {
+  content: "# ";
+}
+
+.prose h2::before {
+  content: "## ";
+}
+
+.prose h3::before {
+  content: "### ";
+}
+
+.prose h4::before {
+  content: "#### ";
+}
+
+.prose h5::before {
+  content: "##### ";
+}
+
+.prose h6::before {
+  content: "###### ";
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.1em;
+  padding-left: 2ch;
+}
+
+.prose li {
+  margin: 0.25em 0;
+}
+
+.prose ul > li::marker {
+  content: "– ";
+  color: var(--muted);
+}
+
+.prose blockquote {
+  margin: 0 0 1.1em;
+  padding-left: 1em;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose hr {
+  margin: 2em 0;
+  border: none;
+  border-top: 1px solid var(--line);
+}
+
+.prose figure {
+  margin: 0 0 1.1em;
+  text-align: center;
+}
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+  border-radius: 6px;
+}
+
+.prose figcaption {
+  margin-top: 0.5em;
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  background-color: var(--layer-2);
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.prose .expressive-code {
+  margin: 0 0 1.1em;
+}
+
+.prose .expressive-code pre {
+  max-block-size: min(68vh, 1000px);
+  overflow-y: auto;
+}
+
+.prose .expressive-code .gutter .ln {
+  padding-inline: 1.5ch 0.5ch;
+}
+
+.prose [style*="--guide-step"] .ec-line .code::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--ec-codePadInl);
+  width: var(--ecIndent, 0ch);
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--line) 80%, transparent) 0 1px,
+    transparent 1px var(--guide-step)
+  );
+  pointer-events: none;
+}
+
+.prose .expressive-code .copy .feedback {
+  padding: 0.5em 0.7em;
+  background-color: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: calc(var(--fs) * 0.78);
+  line-height: 1.4;
+}
+
+.prose .expressive-code .copy .feedback::after {
+  display: none;
+}
+
+.prose .table-scroll {
+  margin: 0 0 1.1em;
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.prose :is(th, td) {
+  padding: 0.55em 0.9em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose thead th {
+  background-color: var(--layer-2);
+  color: var(--fg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prose tbody tr:nth-child(even) > * {
+  background-color: var(--layer-1);
+}
+
+.prose :is(thead tr, tbody tr:nth-child(even)) > :first-child {
+  border-start-start-radius: 6px;
+  border-end-start-radius: 6px;
+}
+
+.prose :is(thead tr, tbody tr:nth-child(even)) > :last-child {
+  border-start-end-radius: 6px;
+  border-end-end-radius: 6px;
+}
+
+.prose a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.prose a:hover {
+  text-decoration-color: currentColor;
+}

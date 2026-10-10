@@ -1,0 +1,81 @@
+---
+import { LINKS } from "~/lib/consts"
+---
+
+<div class="about">
+  <div class="status">
+    <h1><span class="greeting">hello</span></h1>
+    <p class="elsewhere">
+      elsewhere:{" "}
+      {
+        LINKS.map((link, index) => (
+          <>
+            <a href={link.href} target="_blank" rel="noopener noreferrer">
+              {link.label}
+            </a>
+            {index < LINKS.length - 1 && <span aria-hidden="true"> · </span>}
+          </>
+        ))
+      }
+    </p>
+  </div>
+</div>
+
+<style>
+  .about {
+    display: grid;
+    gap: 1.6em;
+    align-content: start;
+  }
+
+  .status {
+    display: grid;
+    gap: 0.9em;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2.6em;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .greeting {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent));
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: greeting-shift 7s linear infinite;
+  }
+
+  @keyframes greeting-shift {
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+
+  .elsewhere {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .elsewhere a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .elsewhere a:hover {
+    text-decoration-color: currentColor;
+  }
+
+
+  @media (prefers-reduced-motion: reduce) {
+    .greeting {
+      animation: none;
+    }
+  }
+</style>

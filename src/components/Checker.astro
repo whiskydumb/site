@@ -1,4 +1,12 @@
-<div class="checker" aria-hidden="true"></div>
+---
+interface Props {
+  still?: boolean
+}
+
+const { still = false } = Astro.props
+---
+
+<div class:list={["checker", { still }]} aria-hidden="true"></div>
 
 <style>
   .checker {
@@ -18,6 +26,11 @@
     background-size: var(--tile) var(--tile);
     animation: checker-drift 8s linear infinite;
     will-change: transform;
+  }
+
+  .checker.still {
+    animation: none;
+    will-change: auto;
   }
 
   @keyframes checker-drift {

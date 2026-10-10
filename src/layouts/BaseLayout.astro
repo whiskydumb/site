@@ -1,15 +1,18 @@
 ---
 import "~/styles/global.css"
+import { Font } from "astro:assets"
 import Checker from "~/components/Checker.astro"
-import { DEFAULT_PALETTE, PALETTES } from "~/palettes"
-import { SITE } from "~/consts"
+import { DEFAULT_PALETTE, PALETTES } from "~/lib/palettes"
+import { SITE } from "~/lib/consts"
 
 interface Props {
   title?: string
   description?: string
+  noindex?: boolean
+  staticBg?: boolean
 }
 
-const { title = SITE.title, description = SITE.description } = Astro.props
+const { title = SITE.title, description = SITE.description, noindex = false, staticBg = false } = Astro.props
 ---
 
 <!doctype html>
@@ -18,7 +21,12 @@ const { title = SITE.title, description = SITE.description } = Astro.props
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <title>{title}</title>
+    <Font cssVariable="--font-plex-sans" />
+    <Font cssVariable="--font-plex-mono" />
+    <link rel="stylesheet" href="/cursors.css" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href={new URL("rss.xml", Astro.site)} />
     <script is:inline define:vars={{ palettes: PALETTES }}>
       let palette = null
       try {
@@ -34,7 +42,20 @@ const { title = SITE.title, description = SITE.description } = Astro.props
     </script>
   </head>
   <body>
-    <Checker />
-    <slot />
+    <Checker still={staticBg} />
+    <main>
+      <slot />
+    </main>
   </body>
 </html>
+
+<style>
+  main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: max(clamp(40px, 6vh, 96px), 100px) 16px clamp(40px, 6vh, 96px);
+  }
+</style>

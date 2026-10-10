@@ -1,0 +1,139 @@
+---
+import "~/styles/prose.css"
+import { render } from "astro:content"
+import Frame from "~/components/Frame.astro"
+import Toc from "~/components/Toc.astro"
+import BaseLayout from "~/layouts/BaseLayout.astro"
+import { postDate } from "~/lib/dates"
+import { getPosts, readingMinutes, type Post } from "~/lib/posts"
+
+export async function getStaticPaths() {
+  const posts = await getPosts()
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }))
+}
+
+interface Props {
+  post: Post
+}
+
+const { post } = Astro.props
+const { Content, headings } = await render(post)
+const date = postDate(post.data.date)
+---
+
+<BaseLayout title={`${post.data.title} · whisky`} description={post.data.description} staticBg>
+  <Frame>
+    <span slot="meta" class="meta">
+      <time datetime={date.iso}>
+        <span class="month-long">{date.month}</span><span class="month-short">{date.month.slice(0, 3)}</span>{" "}
+        {date.day}<sup>{date.suffix}</sup>, {date.year}
+      </time>
+      <span>{readingMinutes(post)} min read</span>
+    </span>
+    <a slot="bar" class="back" href="/#blog">&lt; back</a>
+    <article class="post">
+      <div class="column">
+        <header class="head">
+          <h1>{post.data.title}</h1>
+        </header>
+        <Toc headings={headings} />
+        <div class="prose">
+          <Content />
+        </div>
+      </div>
+    </article>
+  </Frame>
+</BaseLayout>
+
+<script>
+  document.querySelector(".prose")?.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element) || event.target.closest("a, button")) return
+    const heading = event.target.closest("h1, h2, h3, h4, h5, h6")
+    if (!heading?.id || location.hash === `#${heading.id}`) return
+    history.pushState(null, "", `#${heading.id}`)
+  })
+</script>
+
+<style>
+  .back {
+    align-self: center;
+    padding: 0.7em 1.1em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .post {
+    padding: clamp(22px, 2.4vw, 44px);
+  }
+
+  .column {
+    display: grid;
+    gap: 1.6em;
+    width: min(80ch, 100%);
+    margin-inline: auto;
+    font-family: var(--font-mono);
+    font-size: 15px;
+  }
+
+  .head {
+    padding-bottom: 1.2em;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: calc(var(--fs) * 1.8);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .meta {
+    display: flex;
+    gap: 0.6em;
+    margin-left: -0.5em;
+    padding-right: 1.1em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .meta::before,
+  .meta > span::before {
+    content: "·";
+  }
+
+  .meta > span::before {
+    margin-right: 0.6em;
+  }
+
+  .meta sup {
+    font-size: 0.7em;
+  }
+
+  .month-short {
+    display: none;
+  }
+
+  @media (max-width: 420px) {
+    .month-long {
+      display: none;
+    }
+
+    .month-short {
+      display: inline;
+    }
+
+    .back {
+      padding-inline: 0.7em;
+    }
+
+    .meta {
+      padding-right: 0.7em;
+    }
+  }
+
+</style>

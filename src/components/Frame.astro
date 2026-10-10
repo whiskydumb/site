@@ -1,0 +1,94 @@
+<article class="window">
+  <slot name="roof" />
+  <header class="bar">
+    <div class="lead">
+      <button class="title" type="button" data-cycle-palette aria-label="whisky.sh, switch palette">
+        <b>whisky</b>.sh
+      </button>
+      <slot name="meta" />
+    </div>
+    <slot name="bar" />
+  </header>
+  <slot />
+</article>
+
+<script>
+  import { PALETTES } from "~/lib/palettes"
+
+  const root = document.documentElement
+
+  document.querySelector("[data-cycle-palette]")?.addEventListener("click", () => {
+    const current = PALETTES.findIndex((palette) => palette === root.dataset.palette)
+    const next = PALETTES[(current + 1) % PALETTES.length]
+    if (!next) return
+
+    root.dataset.palette = next
+    try {
+      localStorage.setItem("palette", next)
+    } catch {}
+
+    document.dispatchEvent(new CustomEvent("palettechange", { detail: next }))
+  })
+</script>
+
+<style>
+  .window {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(var(--window-width), 100%);
+    min-height: 26em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: 0.4em 0.4em 0 color-mix(in srgb, var(--bg) 55%, #000);
+    transition:
+      background-color 0.35s,
+      border-color 0.35s;
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.82em;
+    line-height: normal;
+    transition: border-color 0.35s;
+  }
+
+  .lead {
+    display: flex;
+    align-items: center;
+  }
+
+  .title {
+    padding: 0.7em 1.1em;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font: inherit;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  @media (max-width: 420px) {
+    .bar {
+      gap: 0;
+    }
+
+    .title {
+      padding-inline: 0.7em;
+    }
+  }
+
+  .title b {
+    color: var(--fg);
+    font-weight: 600;
+    transition: color 0.35s;
+  }
+
+  .title:hover b {
+    color: var(--accent);
+  }
+</style>

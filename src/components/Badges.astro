@@ -1,0 +1,86 @@
+---
+const SLOTS: readonly string[] = []
+---
+
+<div class="badges">
+  <div class="wall" data-wall>
+    {
+      SLOTS.map((caption) => (
+        <div class="slot" tabindex="0" data-caption={caption}>
+          88×31
+        </div>
+      ))
+    }
+    <span class="caption" data-caption-out aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+  const wall = document.querySelector<HTMLElement>("[data-wall]")
+  const caption = wall?.querySelector<HTMLElement>("[data-caption-out]")
+
+  if (wall && caption) {
+    for (const slot of wall.querySelectorAll<HTMLElement>("[data-caption]")) {
+      const show = () => {
+        caption.textContent = slot.dataset.caption ?? ""
+      }
+      slot.addEventListener("mouseenter", show)
+      slot.addEventListener("focus", show)
+    }
+    wall.addEventListener("mouseleave", () => {
+      caption.textContent = ""
+    })
+  }
+</script>
+
+<style>
+  .badges {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1em;
+  }
+
+  .wall {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding-bottom: 1.6em;
+  }
+
+  .slot {
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 31px;
+    border: 1px dashed var(--line);
+    color: var(--muted);
+    font-size: 10px;
+    opacity: 0.8;
+    transition:
+      opacity 0.6s,
+      transform 0.15s,
+      border-color 0.35s;
+  }
+
+  .slot:hover,
+  .slot:focus-visible {
+    opacity: 1;
+    transform: scale(1.05);
+    transition:
+      opacity 0.1s,
+      transform 0.15s;
+  }
+
+  .caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.8em;
+    pointer-events: none;
+  }
+</style>

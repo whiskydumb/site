@@ -1,11 +1,162 @@
-<article class="window"></article>
+---
+import About from "~/components/About.astro"
+import Badges from "~/components/Badges.astro"
+import Blog from "~/components/Blog.astro"
+import Frame from "~/components/Frame.astro"
+import Guestbook from "~/components/Guestbook.astro"
+
+const TABS = ["about", "blog", "guestbook", "badges"] as const
+---
+
+<Frame>
+  <img slot="roof" class="counter" data-counter width="216" height="80" alt="visits" />
+  <div slot="bar" class="tabs" role="tablist">
+    {
+      TABS.map((tab, index) => (
+        <button
+          class="tab"
+          type="button"
+          role="tab"
+          id={`tab-${tab}`}
+          data-tab={tab}
+          aria-controls={`panel-${tab}`}
+          aria-selected={index === 0 ? "true" : "false"}
+        >
+          {tab}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="panels">
+    {
+      TABS.map((tab, index) => (
+        <section
+          class="panel"
+          role="tabpanel"
+          id={`panel-${tab}`}
+          aria-labelledby={`tab-${tab}`}
+          hidden={index !== 0}
+        >
+          {tab === "about" && <About />}
+          {tab === "blog" && <Blog />}
+          {tab === "guestbook" && <Guestbook />}
+          {tab === "badges" && <Badges />}
+        </section>
+      ))
+    }
+  </div>
+</Frame>
+
+<script is:inline>
+  {
+    const tabs = [...document.querySelectorAll("[data-tab]")]
+
+    const selectTab = (tab) => {
+      for (const other of tabs) {
+        const selected = other === tab
+        other.setAttribute("aria-selected", String(selected))
+        const panel = document.getElementById(other.getAttribute("aria-controls"))
+        if (panel) panel.hidden = !selected
+      }
+    }
+
+    const tabFromHash = () => tabs.find((tab) => `#${tab.dataset.tab}` === location.hash) ?? tabs[0]
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => {
+        selectTab(tab)
+        history.replaceState(null, "", tab === tabs[0] ? location.pathname : `#${tab.dataset.tab}`)
+      })
+    }
+
+    selectTab(tabFromHash())
+    addEventListener("hashchange", () => selectTab(tabFromHash()))
+  }
+</script>
+
+<script>
+  import { COUNTER } from "~/lib/consts"
+  import { DEFAULT_PALETTE } from "~/lib/palettes"
+
+  const counter = document.querySelector<HTMLImageElement>("[data-counter]")
+
+  const counterSrc = (route: "get" | "record", theme: string) =>
+    `${COUNTER.origin}/${route}/@${COUNTER.name}?theme=${theme}&pad=${COUNTER.pad}`
+
+  if (counter) {
+    const palette = document.documentElement.dataset.palette ?? DEFAULT_PALETTE
+    counter.src = counterSrc(import.meta.env.DEV ? "record" : "get", palette)
+
+    document.addEventListener("palettechange", (event) => {
+      if (event instanceof CustomEvent && typeof event.detail === "string") {
+        counter.src = counterSrc("record", event.detail)
+      }
+    })
+  }
+</script>
 
 <style>
-  .window {
-    width: min(clamp(600px, 52vw, 1120px), 100%);
-    min-height: 26em;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    box-shadow: 0.4em 0.4em 0 color-mix(in srgb, var(--bg) 55%, #000);
+  .counter {
+    position: absolute;
+    bottom: 100%;
+    right: 0.5em;
+    width: auto;
+    height: 80px;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 2px rgb(0 0 0 / 0.7));
+    transition: filter 0.2s;
+  }
+
+  .counter:not([src]) {
+    visibility: hidden;
+  }
+
+  .counter:hover {
+    filter: drop-shadow(6px 6px 2px rgb(0 0 0 / 0.7));
+  }
+
+  .tabs {
+    display: flex;
+  }
+
+  .tab {
+    padding: 0.7em 1.1em;
+    background: none;
+    border: none;
+    border-left: 1px solid var(--line);
+    color: var(--muted);
+    font: inherit;
+    cursor: var(--cursor-pointer, pointer);
+    transition:
+      color 0.35s,
+      background-color 0.35s,
+      border-color 0.35s;
+  }
+
+  .tab:hover {
+    color: var(--fg);
+  }
+
+  .tab[aria-selected="true"] {
+    color: var(--bg);
+    background: var(--accent);
+  }
+
+  .panels {
+    display: grid;
+    flex: 1;
+  }
+
+  .panel {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(22px, 2.4vw, 44px);
+  }
+
+  .panel[hidden] {
+    display: flex;
+    visibility: hidden;
   }
 </style>
