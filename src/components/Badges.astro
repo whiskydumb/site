@@ -1,5 +1,19 @@
 ---
-const SLOTS: readonly string[] = []
+interface Badge {
+  readonly src: string
+  readonly alt: string
+  readonly href?: string
+}
+
+const BADGES: readonly Badge[] = [
+  { src: "/88x31.gif", alt: "whisky.sh" },
+  { src: "/88x31/underwear-is-for-losers.gif", alt: "underwear is for losers!" },
+  { src: "/88x31/piracy-now.gif", alt: "piracy now!" },
+  { src: "/88x31/ublock-origin.png", alt: "uBlock Origin now!", href: "https://ublockorigin.com/" },
+  { src: "/88x31/nixos.png", alt: "powered by NixOS", href: "https://nixos.org/" },
+  { src: "/88x31/matrix.png", alt: "Matrix", href: "https://matrix.org/" },
+  { src: "/88x31/archive-org.png", alt: "Internet Archive", href: "https://archive.org/" },
+]
 
 const BUTTON_CODE =
   '<a href="https://whisky.sh"><img src="https://whisky.sh/88x31.gif" width="88" height="31" alt="whisky.sh"></a>'
@@ -8,11 +22,17 @@ const BUTTON_CODE =
 <div class="badges">
   <div class="wall" data-wall>
     {
-      SLOTS.map((caption) => (
-        <div class="slot" tabindex="0" data-caption={caption}>
-          88×31
-        </div>
-      ))
+      BADGES.map(({ src, alt, href }) =>
+        href ? (
+          <a class="slot" href={href} target="_blank" rel="noopener" data-caption={alt}>
+            <img src={src} alt={alt} width="88" height="31" loading="lazy" decoding="async" />
+          </a>
+        ) : (
+          <span class="slot" data-caption={alt}>
+            <img src={src} alt={alt} width="88" height="31" loading="lazy" decoding="async" />
+          </span>
+        ),
+      )
     }
     <span class="caption" data-caption-out aria-live="polite"></span>
   </div>
@@ -74,18 +94,13 @@ const BUTTON_CODE =
   }
 
   .slot {
-    display: grid;
-    place-items: center;
+    display: block;
     width: 88px;
     height: 31px;
-    border: 1px dashed var(--line);
-    color: var(--muted);
-    font-size: 10px;
     opacity: 0.8;
     transition:
       opacity 0.6s,
-      transform 0.15s,
-      border-color 0.35s;
+      transform 0.15s;
   }
 
   .slot:hover,
@@ -95,6 +110,11 @@ const BUTTON_CODE =
     transition:
       opacity 0.1s,
       transform 0.15s;
+  }
+
+  .slot img {
+    display: block;
+    image-rendering: pixelated;
   }
 
   .caption {
