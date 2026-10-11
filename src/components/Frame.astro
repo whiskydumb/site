@@ -13,19 +13,14 @@
 </article>
 
 <script>
-  import { PALETTES } from "~/lib/palettes"
-
-  const root = document.documentElement
+  import { applyPalette, PALETTES } from "~/lib/palettes"
 
   document.querySelector("[data-cycle-palette]")?.addEventListener("click", () => {
-    const current = PALETTES.findIndex((palette) => palette === root.dataset.palette)
+    const current = PALETTES.findIndex((palette) => palette === document.documentElement.dataset.palette)
     const next = PALETTES[(current + 1) % PALETTES.length]
     if (!next) return
 
-    root.dataset.palette = next
-    try {
-      localStorage.setItem("palette", next)
-    } catch {}
+    applyPalette(next)
 
     document.dispatchEvent(new CustomEvent("palettechange", { detail: next }))
   })

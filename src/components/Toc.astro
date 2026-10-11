@@ -46,7 +46,12 @@ const items = Astro.props.headings.filter((heading) => heading.depth === 2 || he
   const update = () => {
     const line = innerHeight * ACTIVE_LINE
     const current = headings.filter((heading) => heading.getBoundingClientRect().top < line).at(-1)
-    for (const link of links) link.classList.toggle("active", link.hash === `#${current?.id}`)
+    for (const link of links) {
+      const active = link.hash === `#${current?.id}`
+      link.classList.toggle("active", active)
+      if (active) link.setAttribute("aria-current", "location")
+      else link.removeAttribute("aria-current")
+    }
   }
 
   if (links.length > 0) {

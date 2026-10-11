@@ -21,7 +21,7 @@ const { Content, headings } = await render(post)
 const date = postDate(post.data.date)
 ---
 
-<BaseLayout title={`${post.data.title} · whisky`} description={post.data.description} staticBg>
+<BaseLayout title={`${post.data.title} · whisky`} description={post.data.description} type="article" staticBg>
   <Frame>
     <span slot="meta" class="meta">
       <time datetime={date.iso}>

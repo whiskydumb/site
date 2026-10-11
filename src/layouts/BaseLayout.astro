@@ -2,43 +2,60 @@
 import "~/styles/global.css"
 import { Font } from "astro:assets"
 import Checker from "~/components/Checker.astro"
-import { DEFAULT_PALETTE, PALETTES } from "~/lib/palettes"
 import { SITE } from "~/lib/consts"
+import { paletteCss } from "~/lib/palette-css"
+import { DEFAULT_PALETTE, PALETTE_COOKIE, PALETTES, THEME_COLORS } from "~/lib/palettes"
 
 interface Props {
   title?: string
   description?: string
+  type?: "website" | "article"
   noindex?: boolean
   staticBg?: boolean
 }
 
-const { title = SITE.title, description = SITE.description, noindex = false, staticBg = false } = Astro.props
+const {
+  title = SITE.title,
+  description = SITE.description,
+  type = "website",
+  noindex = false,
+  staticBg = false,
+} = Astro.props
+const palette = Astro.locals.palette ?? DEFAULT_PALETTE
+const canonical = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <!doctype html>
-<html lang="en" data-palette={DEFAULT_PALETTE}>
+<html lang="en" data-palette={palette}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content={THEME_COLORS[palette]} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
     <title>{title}</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <Font cssVariable="--font-plex-sans" />
     <Font cssVariable="--font-plex-mono" />
+    <style is:inline set:html={paletteCss()} />
     <link rel="stylesheet" href="/cursors.css" />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href={new URL("rss.xml", Astro.site)} />
-    <script is:inline define:vars={{ palettes: PALETTES }}>
-      let palette = null
-      try {
-        palette = localStorage.getItem("palette")
-      } catch {}
-      if (!palettes.includes(palette)) {
-        palette = palettes[Math.floor(Math.random() * palettes.length)]
-        try {
-          localStorage.setItem("palette", palette)
-        } catch {}
+    <script is:inline define:vars={{ palettes: PALETTES, cookie: PALETTE_COOKIE, themeColors: THEME_COLORS }}>
+      const saved = document.cookie.match(new RegExp(`(?:^|; )${cookie.name}=([^;]*)`))?.[1]
+      const palette = palettes.includes(saved) ? saved : palettes[Math.floor(Math.random() * palettes.length)]
+      if (palette !== saved) {
+        const secure = location.protocol === "https:" ? "; secure" : ""
+        document.cookie = `${cookie.name}=${palette}; path=/; max-age=${cookie.maxAge}; samesite=lax${secure}`
       }
       document.documentElement.dataset.palette = palette
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColors[palette])
     </script>
   </head>
   <body>

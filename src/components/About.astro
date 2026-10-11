@@ -10,7 +10,7 @@ import { LINKS } from "~/lib/consts"
       {
         LINKS.map((link, index) => (
           <>
-            <a href={link.href} target="_blank" rel="noopener noreferrer">
+            <a href={link.href} target="_blank" rel="noopener">
               {link.label}
             </a>
             {index < LINKS.length - 1 && <span aria-hidden="true"> · </span>}

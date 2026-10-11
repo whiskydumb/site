@@ -1,4 +1,4 @@
-import { PALETTE_ACCENTS, PALETTES } from "./palettes"
+import { PALETTE_COLORS, PALETTES } from "./palettes"
 
 const SCALE = 2
 
@@ -64,7 +64,7 @@ const cursorValue = ({ pixels, hotspot, fallback }: Sprite, colors: Record<Shade
 
 export const cursorCss = (): string =>
   PALETTES.map((palette) => {
-    const { accent, accent2 } = PALETTE_ACCENTS[palette]
+    const { accent, accent2 } = PALETTE_COLORS[palette]
     const colors = { O: "#000000", W: "#ffffff", P: accent, L: accent2 }
     return `[data-palette="${palette}"] {\n  --cursor-default: ${cursorValue(SPRITES.default, colors)};\n  --cursor-pointer: ${cursorValue(SPRITES.pointer, colors)};\n}\n`
   }).join("\n")

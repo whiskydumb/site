@@ -1,7 +1,8 @@
+import cloudflare from "@astrojs/cloudflare"
 import { satteri } from "@astrojs/markdown-satteri"
 import mdx from "@astrojs/mdx"
 import expressiveCode from "astro-expressive-code"
-import { defineConfig, fontProviders } from "astro/config"
+import { defineConfig, envField, fontProviders } from "astro/config"
 import { expressiveCodeOptions } from "./src/lib/expressive-code"
 import { externalLinks } from "./src/lib/external-links"
 import { figures } from "./src/lib/figures"
@@ -50,7 +51,14 @@ if (!firstPlexMonoVariant) throw new Error("ibm plex mono: no font variants conf
 
 export default defineConfig({
   site: SITE,
+  adapter: cloudflare({ imageService: "compile" }),
+  session: false,
   integrations: [expressiveCode(expressiveCodeOptions), mdx()],
+  env: {
+    schema: {
+      GUESTBOOK_IP_SECRET: envField.string({ context: "server", access: "secret", min: 32 }),
+    },
+  },
   markdown: {
     processor: satteri({ hastPlugins: [tableScroll, figures, externalLinks(SITE)] }),
   },

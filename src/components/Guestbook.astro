@@ -1,5 +1,21 @@
+---
+import { listPublicEntries } from "~/server/guestbook/guestbook"
+
+const entries = await listPublicEntries()
+---
+
 <div class="guestbook">
-  <ol class="entries"></ol>
+  <ol class="entries">
+    {
+      entries.map((entry) => (
+        <li>
+          <b>{entry.name}</b>
+          <span class="text">{entry.message}</span>
+          {entry.reply && <p class="reply">&gt; {entry.reply}</p>}
+        </li>
+      ))
+    }
+  </ol>
 
   <form class="form" data-guestbook novalidate>
     <textarea class="message" name="message" maxlength="280" placeholder="leave a message" aria-label="message"
@@ -20,11 +36,16 @@
         <button class="send" type="submit">send</button>
       </div>
     </div>
+    <input class="trap" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <p class="status" data-status aria-live="polite"></p>
   </form>
 </div>
 
 <script>
+  import { type ActionError, actions, isInputError } from "astro:actions"
+
   const STORAGE_KEY = "guestbook-sender"
+  const FALLBACK_ERROR = "something broke, try again later"
 
   const save = (name: string) => {
     try {
@@ -45,8 +66,14 @@
   const dm = form?.querySelector<HTMLInputElement>("input[name=dm]")
   const message = form?.querySelector<HTMLTextAreaElement>(".message")
   const send = form?.querySelector<HTMLButtonElement>(".send")
+  const status = form?.querySelector<HTMLElement>("[data-status]")
 
-  if (form && sender && dm && message && send) {
+  const errorText = (error: ActionError): string => {
+    if (isInputError(error)) return Object.values(error.fields).flat()[0] ?? FALLBACK_ERROR
+    return error.code === "INTERNAL_SERVER_ERROR" ? FALLBACK_ERROR : error.message
+  }
+
+  if (form && sender && dm && message && send && status) {
     sender.value = load() ?? ""
 
     sender.addEventListener("change", () => {
@@ -59,8 +86,18 @@
       message.placeholder = dm.checked ? "only i will see this" : "leave a message"
     })
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault()
+      send.disabled = true
+      const { data, error } = await actions.guestbook.send(new FormData(form))
+      send.disabled = false
+      status.dataset.tone = error ? "error" : "ok"
+      if (error) {
+        status.textContent = errorText(error)
+        return
+      }
+      message.value = ""
+      status.textContent = data.isPrivate ? "sent privately" : "sent! it'll show up once i approve it"
     })
   }
 </script>
@@ -88,6 +125,17 @@
     margin-right: 0.6em;
     color: var(--accent);
     font-weight: 600;
+  }
+
+  .text,
+  .reply {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .reply {
+    margin: 0.15em 0 0;
+    color: var(--accent-2-text);
   }
 
   .form {
@@ -209,6 +257,28 @@
     outline: none;
   }
 
+
+  .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .status {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+
+  .status:empty {
+    display: none;
+  }
+
+  .status[data-tone="error"] {
+    color: var(--accent-2-text);
+  }
 
   .send {
     padding: 0.35em 0.8em;

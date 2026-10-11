@@ -1,2 +1,5 @@
+allowBuilds:
+  esbuild: false
+  workerd: false
 minimumReleaseAgeExclude:
   - astro@7.3.8

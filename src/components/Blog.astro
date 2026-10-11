@@ -34,7 +34,9 @@ const posts = await getPosts()
 
   <footer class="foot">
     <a href="/rss.xml">rss</a>
-    <button type="button" data-blog-sort aria-label="post order">newest first ↓</button>
+    <button type="button" data-blog-sort>
+      <span data-sort-label>newest first</span> <span data-sort-arrow aria-hidden="true">↓</span>
+    </button>
   </footer>
 </div>
 
@@ -42,6 +44,8 @@ const posts = await getPosts()
   const scroll = document.querySelector<HTMLElement>("[data-blog-scroll]")
   const list = document.querySelector<HTMLElement>("[data-blog-posts]")
   const sort = document.querySelector<HTMLButtonElement>("[data-blog-sort]")
+  const sortLabel = sort?.querySelector<HTMLElement>("[data-sort-label]")
+  const sortArrow = sort?.querySelector<HTMLElement>("[data-sort-arrow]")
 
   const syncFade = () => {
     if (!scroll) return
@@ -53,9 +57,10 @@ const posts = await getPosts()
 
   let newestFirst = true
   sort?.addEventListener("click", () => {
-    if (!list || !scroll) return
+    if (!list || !scroll || !sortLabel || !sortArrow) return
     newestFirst = !newestFirst
-    sort.textContent = newestFirst ? "newest first ↓" : "oldest first ↑"
+    sortLabel.textContent = newestFirst ? "newest first" : "oldest first"
+    sortArrow.textContent = newestFirst ? "↓" : "↑"
     list.append(...[...list.children].reverse())
     scroll.scrollTop = 0
     syncFade()

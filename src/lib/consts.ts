@@ -1,6 +1,6 @@
 export const SITE = {
   title: "whisky",
-  description: "",
+  description: "making random programming stuff",
 } as const
 
 export interface SocialLink {

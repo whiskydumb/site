@@ -9,7 +9,7 @@ const TABS = ["about", "blog", "guestbook", "badges"] as const
 ---
 
 <Frame>
-  <img slot="roof" class="counter" data-counter width="216" height="80" alt="visits" />
+  <img slot="roof" class="counter" data-counter width="216" height="80" alt="visit counter" />
   <div slot="bar" class="tabs" role="tablist">
     {
       TABS.map((tab, index) => (
@@ -21,6 +21,7 @@ const TABS = ["about", "blog", "guestbook", "badges"] as const
           data-tab={tab}
           aria-controls={`panel-${tab}`}
           aria-selected={index === 0 ? "true" : "false"}
+          tabindex={index === 0 ? 0 : -1}
         >
           {tab}
         </button>
@@ -56,6 +57,7 @@ const TABS = ["about", "blog", "guestbook", "badges"] as const
       for (const other of tabs) {
         const selected = other === tab
         other.setAttribute("aria-selected", String(selected))
+        other.tabIndex = selected ? 0 : -1
         const panel = document.getElementById(other.getAttribute("aria-controls"))
         if (panel) panel.hidden = !selected
       }
@@ -63,11 +65,32 @@ const TABS = ["about", "blog", "guestbook", "badges"] as const
 
     const tabFromHash = () => tabs.find((tab) => `#${tab.dataset.tab}` === location.hash) ?? tabs[0]
 
+    const KEY_STEPS = { ArrowRight: 1, ArrowLeft: -1 }
+
+    const activate = (tab) => {
+      selectTab(tab)
+      history.replaceState(null, "", tab === tabs[0] ? location.pathname : `#${tab.dataset.tab}`)
+    }
+
     for (const tab of tabs) {
-      tab.addEventListener("click", () => {
-        selectTab(tab)
-        history.replaceState(null, "", tab === tabs[0] ? location.pathname : `#${tab.dataset.tab}`)
+      tab.addEventListener("keydown", (event) => {
+        const index = tabs.indexOf(tab)
+        const step = KEY_STEPS[event.key]
+        const target =
+          step !== undefined
+            ? tabs[(index + step + tabs.length) % tabs.length]
+            : event.key === "Home"
+              ? tabs[0]
+              : event.key === "End"
+                ? tabs[tabs.length - 1]
+                : null
+        if (!target) return
+        event.preventDefault()
+        activate(target)
+        target.focus()
       })
+
+      tab.addEventListener("click", () => activate(tab))
     }
 
     selectTab(tabFromHash())

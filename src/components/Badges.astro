@@ -1,5 +1,8 @@
 ---
 const SLOTS: readonly string[] = []
+
+const BUTTON_CODE =
+  '<a href="https://whisky.sh"><img src="https://whisky.sh/88x31.gif" width="88" height="31" alt="whisky.sh"></a>'
 ---
 
 <div class="badges">
@@ -13,6 +16,10 @@ const SLOTS: readonly string[] = []
     }
     <span class="caption" data-caption-out aria-live="polite"></span>
   </div>
+
+  <footer class="foot">
+    <button class="copy" type="button" data-copy-button data-code={BUTTON_CODE} aria-live="polite">copy my button</button>
+  </footer>
 </div>
 
 <script>
@@ -31,6 +38,23 @@ const SLOTS: readonly string[] = []
       caption.textContent = ""
     })
   }
+
+  const copy = document.querySelector<HTMLButtonElement>("[data-copy-button]")
+  let reset: ReturnType<typeof setTimeout> | undefined
+
+  copy?.addEventListener("click", async () => {
+    const label = "copy my button"
+    try {
+      await navigator.clipboard.writeText(copy.dataset.code ?? "")
+      copy.textContent = "copied"
+    } catch {
+      copy.textContent = "copy failed"
+    }
+    clearTimeout(reset)
+    reset = setTimeout(() => {
+      copy.textContent = label
+    }, 2000)
+  })
 </script>
 
 <style>
@@ -82,5 +106,27 @@ const SLOTS: readonly string[] = []
     color: var(--accent);
     font-size: 0.8em;
     pointer-events: none;
+  }
+
+  .foot {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+    font-size: 0.8em;
+  }
+
+  .copy {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font: inherit;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .copy:hover {
+    color: var(--accent);
   }
 </style>
